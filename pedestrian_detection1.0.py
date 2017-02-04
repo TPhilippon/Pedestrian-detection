@@ -62,11 +62,15 @@ while True:
     
     # Resize if needed, then detect people on frame...
     frame = imutils.resize(frame, width=500)
+    fullframe = frame
     
     #### ROI ####
-#    frame = frame[:,:,1]
-#    frame = frame[0:200,0:200]
-    
+    # Draw region of interest (ROI) and draw rectangle
+    frame = frame[100:350,50:450]
+#    cv2.rectangle(fullframe,(100,150),(400,350),(255,0,0),2)
+    cv2.rectangle(fullframe,(50,100),(450,350),(255,0,0),2)
+    # Draw line
+    cv2.line(fullframe,(250,400),(250,100),(255,0,0),1)
     # HOG
     (rects, weights) = hog.detectMultiScale(frame, winStride=(8,8),
     		padding=(16, 16), scale=1.05)
@@ -88,16 +92,16 @@ while True:
     # draw the final bounding boxes (use rects or pick if non-maxima are applied).
     for (xA, yA, xB, yB) in pick:
         cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
-        
+    
     # ==============================================================
     ### draw the text with number of people détected on the frame.
     number = len(pick)
-    cv2.putText(frame, "People detected : "+str(number),
+    cv2.putText(fullframe, "People detected : "+str(number),
                 (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
 
     # Display image of record + boxes + text counting people.
 #    cv2.imshow("Before NMS", orig)
-    cv2.imshow("After NMS", frame)
+    cv2.imshow("After NMS", fullframe)
     
     # ================================================================
     # Wait for key to be pressed if needed to stop the process.
@@ -105,6 +109,8 @@ while True:
     if k == 27:
         camera.release()
         cv2.destroyAllWindows()
+        for i in range (1,5):
+            cv2.waitKey(1)
 #        cv2.waitKey(1)
         print("interruption.")
         sys.exit()
