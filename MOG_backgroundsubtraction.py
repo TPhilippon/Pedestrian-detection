@@ -50,9 +50,9 @@ while True:
     
     # ===========================================================
     # Morpho math
-    erosion = cv2.erode(fgmask, kernel1, iterations = 1)
+    erosion = cv2.erode(fgmask, kernel0, iterations = 1)
 #    opening = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel3)
-    dilation = cv2.dilate(erosion, kernel3, iterations = 2)
+    dilation = cv2.dilate(erosion, kernel3, iterations = 1)
 #    erosion = cv2.erode(dilation, kernel3, iterations = 6)
 #    closing = cv2.morphologyEx(dilation, cv2.MORPH_CLOSE, kernel3)
     img = dilation
