@@ -7,6 +7,8 @@ Created on Tue Dec 13 15:43:56 2016
 
 # import the necessary packages
 from __future__ import print_function
+from matplotlib import pyplot
+import matplotlib as mpl
 from imutils.object_detection import non_max_suppression
 from imutils import paths
 import numpy as np
@@ -57,9 +59,18 @@ points_stack = np.empty((1,2))
 
 # initialize frame size for matrix.
 (grabbed, frame) = camera.read()
-matrix = np.zeros((frame.shape[0], frame.shape[1]))
+matrix = np.zeros((frame.shape[0], frame.shape[1]))    # np.uint8
+matrix = imutils.resize(matrix, width=500)
 #camera.release()
 #cv2.destroyAllWindows()
+
+### MATPLOTLIB
+# Plot matrix initialize color map and figure.
+#fig = pyplot.figure(2)
+#cmap2 = mpl.colors.LinearSegmentedColormap.from_list('my_colormap',
+#                                           ['white','orange','red'],
+#                                           256)
+###
 
 #==============================================================================
 # ##################### Loop on the frames of video ##################
@@ -106,43 +117,56 @@ while True:
     for (xA, yA, xB, yB) in pick:
         cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 1)
         
-        # Set center point param.
-        Xcenter, Ycenter = (xA+xB)/2, ((yA+yB)/2)
-        point_to_add = np.array([[Xcenter, Ycenter]])
-                           
+        # Set center point param. Correction on Y of the center to match feets position.
+        Xcenter, Ycenter = (xA+xB)/2, (((yA+yB)/2)+50)
+        point_to_add = np.array([[int(Xcenter), int(Ycenter)]])
+    
+        # Set pixel of matrice value + 1.
+        matrix[Ycenter+100,Xcenter+50] = matrix[Ycenter+100,Xcenter+50]+1
+        
         # Draw point and set param for line counter.
 #        cv2.circle(frame, (Xcenter, Ycenter), 0, (0,0,255), 3)
 #        Xp = 50+(xA+xB)/2
                 
         # Memory and stacking.
-        center_memory = np.vstack([memory, (Xcenter, Ycenter)])
+        center_memory = np.vstack([memory, (int(Xcenter), int(Ycenter))])
         points_stack = np.vstack([points_stack,point_to_add])
 #        print(Xpoint)
 
-        # Counte when object "cross" the line.
+        # Count when object "cross" the line.
 #        delta = Xp-prevXp
 #        if Xp >= 250 and prevXp < 250 and delta <= 5:
 #            line_counter += 1
 #        prevXp = Xp
-    # ==============================================================
-    ### draw the text with number of people détected on the frame and
-    # draw circle to the a size based on that number.
+#==============================================================================
+#     ### draw the text with number of people détected on the frame and
+#     # draw circle to the a size based on that number.
+#==============================================================================
     number = len(pick)
 #    cv2.circle(frame, (390, 240), number*3, (0,0,255), -1)
     cv2.putText(fullframe, "People detected : "+str(number),
                 (10, fullframe.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
-    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
-                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-    # ==============================================================
-    ### Draw each point détected from the begenning.
+#    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
+#                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+#==============================================================================
+#     ### Draw each point détected from the begenning.
+#==============================================================================
     for XY in points_stack:
         XYx = int(XY[0])
         XYy = int(XY[1])
         cv2.circle(frame, (XYx, XYy), 1, (0,0,255), -1)
     
-    # Display image of record + boxes + text counting people.
-#    cv2.imshow("Before NMS", orig)
-    cv2.imshow("After NMS", fullframe)
+    # Display image of record + boxes + text counting people. Add colormap.
+#    cv2.imshow("Before NMS", orig) 
+    cv2.imshow("After NMS", fullframe); # to see camera frames
+    cv2.imshow("Mat", matrix)
+    
+    # Plot on matplotlib figure.
+#    img2 = pyplot.imshow(matrix,interpolation='nearest',
+#                    cmap = cmap2,
+#                    origin='upper')
+#    pyplot.colorbar(img2,cmap=cmap2)
+#    pyplot.show()
     
     # Update
 #    print("frame n° : "+frame_counter)
@@ -156,7 +180,7 @@ while True:
 #    prevpick = pick
     # ================================================================
     # Wait for key to be pressed if needed to stop the process.
-    k = cv2.waitKey(100) & 0xff
+    k = cv2.waitKey(10) & 0xff
     if k == 27:
         camera.release()
         cv2.destroyAllWindows()
@@ -166,12 +190,52 @@ while True:
         sys.exit()
     # Record key press and break if hit "esc".
 
+
+
+#==============================================================================
+# # *** end detection /// Plot of matrix /// ***
+#==============================================================================
+
+
+#cmaps = [('Plot')]
+#nrows = max(len(cmap_list) for cmap_category, cmap_list in cmaps)
+#gradient = np.linspace(0, 1, 256)
+#gradient = np.vstack((gradient, gradient))
+
+###
+#fig = pyplot.figure(2)
+#
+#cmap2 = mpl.colors.LinearSegmentedColormap.from_list('my_colormap',
+#                                           ['white','orange','red'],
+#                                           256)
+#
+#img2 = pyplot.imshow(matrix,interpolation='nearest',
+#                    cmap = cmap2,
+#                    origin='upper')
+#
+#pyplot.colorbar(img2,cmap=cmap2)
+###
+
+
+
+
 print("end.")
 
 
 
 
 # ARCHIVES
+
+    # color mapping
+#    m_color = cv2.cvtColor(matrix, cv2.COLOR_BGR2HSV)
+#    matrix = cv2.imread(matrix)
+#    cv2.imwrite('matrix.png',matrix)
+#    matrix_color = cv2.applyColorMap(matrix, cv2.COLORMAP_HOT)
+
+#    matrix_grey = cv2.adaptiveThreshold(matrix, 20, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 0)
+#    matrix_grey = cv2.imread(matrix,cv2.IMREAD_GRAYSCALE)
+
+
     # Moment and centroïd
 #    if not pick:
 #        pass
