@@ -54,6 +54,13 @@ prevXp = 250
 # Array stock
 memory = np.empty((1,2))
 points_stack = np.empty((1,2))
+
+# initialize frame size for matrix.
+(grabbed, frame) = camera.read()
+matrix = np.zeros((frame.shape[0], frame.shape[1]))
+#camera.release()
+#cv2.destroyAllWindows()
+
 #==============================================================================
 # ##################### Loop on the frames of video ##################
 #==============================================================================
@@ -124,8 +131,8 @@ while True:
 #    cv2.circle(frame, (390, 240), number*3, (0,0,255), -1)
     cv2.putText(fullframe, "People detected : "+str(number),
                 (10, fullframe.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
-#    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
-#                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
+                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
     # ==============================================================
     ### Draw each point détected from the begenning.
     for XY in points_stack:
