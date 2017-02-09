@@ -45,7 +45,7 @@ camera = cv2.VideoCapture('/Users/terencephilippon/Python/VIDEO/Video Data/campu
 #camera = cv2.VideoCapture(path)
 
 # Choosing start frame.
-camera.set(1, 375)
+camera.set(1, 45)
 
 # initialize the first frame in the video stream.
 firstFrame = None
@@ -53,10 +53,14 @@ line_counter = 0
 frame_counter = 0
 reset_counter = 0
 prevXp = 250
+tolerance = np.array([[3,3]])
 # Array stock
-memory = np.empty((1,2))
-points_stack = np.empty((1,2))
-
+#memory1 = np.zeros((1,2))
+#memory2 = np.zeros((1,2))
+points_stack = np.zeros((1,2))
+t2 = np.zeros((1,2))
+t1 = np.zeros((1,2))
+points_stack_temp = np.zeros((1,2))
 # initialize frame size for matrix.
 (grabbed, frame) = camera.read()
 matrix = np.zeros((frame.shape[0], frame.shape[1]))    # np.uint8
@@ -82,7 +86,7 @@ while True:
     if not grabbed:
         break
     
-    # Resize if needed, then detect people on frame...
+    # Resize if needed, then detect people on frame... 
     frame = imutils.resize(frame, width=500)
     fullframe = frame
     
@@ -129,15 +133,38 @@ while True:
 #        Xp = 50+(xA+xB)/2
                 
         # Memory and stacking.
-        center_memory = np.vstack([memory, (int(Xcenter), int(Ycenter))])
+#        center_memory = np.vstack([memory, (int(Xcenter), int(Ycenter))])
         points_stack = np.vstack([points_stack,point_to_add])
+        points_stack_temp = np.vstack([points_stack_temp,point_to_add])
+        t2 = points_stack_temp
+
 #        print(Xpoint)
 
         # Count when object "cross" the line.
 #        delta = Xp-prevXp
-#        if Xp >= 250 and prevXp < 250 and delta <= 5:
+
+#        if points_temps >= 250 and prevXp < 250 and delta <= 5:
 #            line_counter += 1
 #        prevXp = Xp
+
+    if t1.shape < t2.shape:
+        t1.resize((t2.shape), refcheck=False)
+    else:
+        t2.resize((t1.shape), refcheck=False)
+#    delta = t2 - t1
+    t12 = np.hstack((t1,t2))
+#    deltaXY = np.hstack((delta,t12))
+    print(t12)
+    for (x1,y1,x2,y2) in t12 :
+        if (x1+50) < 250 and (x2+50) >= 250 and abs(x2-x1)<10 and abs(y2-y1)<10:
+            line_counter +=1
+            print(x1,y2,x2,y2)
+        
+        
+    t1 = t2
+    t2 = np.zeros((1,2))
+    points_stack_temp = np.zeros((1,2))
+    
 #==============================================================================
 #     ### draw the text with number of people détected on the frame and
 #     # draw circle to the a size based on that number.
@@ -146,8 +173,8 @@ while True:
 #    cv2.circle(frame, (390, 240), number*3, (0,0,255), -1)
     cv2.putText(fullframe, "People detected : "+str(number),
                 (10, fullframe.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
-#    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
-#                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+    cv2.putText(fullframe, "Sens --> : "+str(line_counter),
+                (20, fullframe.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 #==============================================================================
 #     ### Draw each point détected from the begenning.
 #==============================================================================
