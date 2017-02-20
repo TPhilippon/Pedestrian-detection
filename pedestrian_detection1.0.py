@@ -52,8 +52,8 @@ firstFrame = None
 line_counter = 0
 frame_counter = 0
 reset_counter = 0
-prevXp = 250
-tolerance = np.array([[3,3]])
+#prevXp = 250
+#tolerance = np.array([[3,3]])
 # Array stock
 #memory1 = np.zeros((1,2))
 #memory2 = np.zeros((1,2))
