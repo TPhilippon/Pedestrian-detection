@@ -55,7 +55,7 @@ camera = cv2.VideoCapture('/Users/terencephilippon/Python/VIDEO/Video Data/IMG_3
 #camera = cv2.VideoCapture(path)
 
 # Choosing start frame.
-camera.set(1, 150)
+camera.set(1, 200)
 
 # initialize the first frame in the video stream.
 firstFrame = None
@@ -112,7 +112,7 @@ while True:
 #     # HOG
 #==============================================================================
     (rects, weights) = hog.detectMultiScale(frame, winStride=(8,8),
-    		padding=(16, 16), scale=1.10)
+    		padding=(16, 16), scale=1.05)
     
 #     draw the original bounding boxes (red) * Facultatif *
 #    for (x, y, w, h) in rects:
@@ -137,7 +137,7 @@ while True:
         point_to_add = np.array([[int(Xcenter), int(Ycenter)]])
     
         # Set pixel of matrice value + 1.
-        matrix[Ycenter+100,Xcenter+50] = matrix[Ycenter+100,Xcenter+50]+1
+#        matrix[Ycenter+100,Xcenter+50] = matrix[Ycenter+100,Xcenter+50]+1
         
         # Draw point and set param for line counter.
 #        cv2.circle(frame, (Xcenter, Ycenter), 0, (0,0,255), 3)
@@ -167,8 +167,8 @@ while True:
         if (x1+50) < 250 and (x2+50) >= 250 and abs(x2-x1)<10 and abs(y2-y1)<10:
             line_counter +=1
             print(x1,y2,x2,y2)
-        
-        
+    
+    
     t1 = t2
     t2 = np.zeros((1,2))
     points_stack_temp = np.zeros((1,2))
